@@ -58,6 +58,9 @@ public class Position implements Serializable {
     /** The cost model for holding the asset */
     private CostModel holdingCostModel;
 
+    /** Additional position data, extension point */
+    private CustomPositionData customPositionData;
+
     /**
      * Constructor.
      */
@@ -126,6 +129,7 @@ public class Position implements Serializable {
         this.exit = exit;
         this.transactionCostModel = transactionCostModel;
         this.holdingCostModel = holdingCostModel;
+
     }
 
     /**
@@ -405,5 +409,13 @@ public class Position implements Serializable {
 
     private Num numOf(Number num) {
         return entry.getNetPrice().numOf(num);
+    }
+
+    public CustomPositionData getCustomPositionData() {
+        return customPositionData;
+    }
+
+    public void setCustomPositionData(CustomPositionData customPositionData) {
+        this.customPositionData = customPositionData;
     }
 }

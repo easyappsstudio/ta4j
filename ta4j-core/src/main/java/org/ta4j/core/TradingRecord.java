@@ -82,6 +82,10 @@ public interface TradingRecord extends Serializable {
         return enter(index, NaN, NaN);
     }
 
+    void operate(int index, CustomPositionData positionData);
+
+    boolean enter(int index, CustomPositionData positionData);
+
     /**
      * Places an entry trade in the trading record.
      * 
@@ -118,6 +122,8 @@ public interface TradingRecord extends Serializable {
     default boolean isClosed() {
         return !getCurrentPosition().isOpened();
     }
+
+    boolean exit(int index, Num price);
 
     /**
      * @return the recorded positions
