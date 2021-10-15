@@ -25,6 +25,8 @@ package org.ta4j.core.rules;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.ta4j.core.Trade.TradeType.BUY;
+import static org.ta4j.core.Trade.TradeType.SELL;
 
 import java.util.function.Function;
 
@@ -54,7 +56,7 @@ public class StopLossRuleTest extends AbstractIndicatorTest<BarSeries, Num> {
 
     @Test
     public void isSatisfiedWorksForBuy() {
-        final TradingRecord tradingRecord = new BaseTradingRecord(Trade.TradeType.BUY);
+        final TradingRecord tradingRecord = new BaseTradingRecord();
         final Num tradedAmount = numOf(1);
 
         // 5% stop-loss
@@ -64,7 +66,7 @@ public class StopLossRuleTest extends AbstractIndicatorTest<BarSeries, Num> {
         assertFalse(rule.isSatisfied(1, tradingRecord));
 
         // Enter at 114
-        tradingRecord.enter(2, numOf(114), tradedAmount);
+        tradingRecord.enter(2, BUY, numOf(114), tradedAmount);
         assertFalse(rule.isSatisfied(2, tradingRecord));
         assertFalse(rule.isSatisfied(3, tradingRecord));
         assertTrue(rule.isSatisfied(4, tradingRecord));
@@ -72,7 +74,7 @@ public class StopLossRuleTest extends AbstractIndicatorTest<BarSeries, Num> {
         tradingRecord.exit(5);
 
         // Enter at 128
-        tradingRecord.enter(5, numOf(128), tradedAmount);
+        tradingRecord.enter(5, BUY, numOf(128), tradedAmount);
         assertFalse(rule.isSatisfied(5, tradingRecord));
         assertTrue(rule.isSatisfied(6, tradingRecord));
         assertTrue(rule.isSatisfied(7, tradingRecord));
@@ -80,7 +82,7 @@ public class StopLossRuleTest extends AbstractIndicatorTest<BarSeries, Num> {
 
     @Test
     public void isSatisfiedWorksForSell() {
-        final TradingRecord tradingRecord = new BaseTradingRecord(Trade.TradeType.SELL);
+        final TradingRecord tradingRecord = new BaseTradingRecord();
         final Num tradedAmount = numOf(1);
 
         // 5% stop-loss
@@ -90,7 +92,7 @@ public class StopLossRuleTest extends AbstractIndicatorTest<BarSeries, Num> {
         assertFalse(rule.isSatisfied(1, tradingRecord));
 
         // Enter at 108
-        tradingRecord.enter(1, numOf(108), tradedAmount);
+        tradingRecord.enter(1, SELL, numOf(108), tradedAmount);
         assertFalse(rule.isSatisfied(1, tradingRecord));
         assertFalse(rule.isSatisfied(2, tradingRecord));
         assertTrue(rule.isSatisfied(3, tradingRecord));
@@ -98,7 +100,7 @@ public class StopLossRuleTest extends AbstractIndicatorTest<BarSeries, Num> {
         tradingRecord.exit(4);
 
         // Enter at 114
-        tradingRecord.enter(2, numOf(114), tradedAmount);
+        tradingRecord.enter(2, SELL, numOf(114), tradedAmount);
         assertFalse(rule.isSatisfied(2, tradingRecord));
         assertTrue(rule.isSatisfied(3, tradingRecord));
         assertFalse(rule.isSatisfied(4, tradingRecord));

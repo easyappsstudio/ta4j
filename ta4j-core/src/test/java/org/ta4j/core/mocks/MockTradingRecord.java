@@ -26,6 +26,7 @@ package org.ta4j.core.mocks;
 import java.util.List;
 
 import org.ta4j.core.BaseTradingRecord;
+import org.ta4j.core.Trade;
 import org.ta4j.core.num.Num;
 
 public class MockTradingRecord extends BaseTradingRecord {
@@ -45,7 +46,7 @@ public class MockTradingRecord extends BaseTradingRecord {
         for (int i = 0; i < states.size(); i++) {
             double state = states.get(i).doubleValue();
             if (state != lastState) {
-                this.operate(i);
+                this.operate(i, Trade.TradeType.BUY);
             }
             lastState = state;
         }

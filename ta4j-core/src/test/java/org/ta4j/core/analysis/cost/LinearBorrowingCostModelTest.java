@@ -90,8 +90,8 @@ public class LinearBorrowingCostModelTest {
         // Short selling incurs borrowing costs. Since position is still open, accounted
         // for until current index
         int currentIndex = 4;
-        Position position = new Position(Trade.TradeType.SELL, new ZeroCostModel(), borrowingModel);
-        position.operate(0, DoubleNum.valueOf(100), DoubleNum.valueOf(1));
+        Position position = new Position(new ZeroCostModel(), borrowingModel);
+        position.operate(0, Trade.TradeType.SELL, DoubleNum.valueOf(100), DoubleNum.valueOf(1));
 
         Num costsFromPosition = position.getHoldingCost(currentIndex);
         Num costsFromModel = borrowingModel.calculate(position, currentIndex);

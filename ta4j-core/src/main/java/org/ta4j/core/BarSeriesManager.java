@@ -164,11 +164,11 @@ public class BarSeriesManager {
             log.trace("Running strategy (indexes: {} -> {}): {} (starting with {})", runBeginIndex, runEndIndex,
                     strategy, tradeType);
         }
-        TradingRecord tradingRecord = new BaseTradingRecord(tradeType, transactionCostModel, holdingCostModel);
+        TradingRecord tradingRecord = new BaseTradingRecord(transactionCostModel, holdingCostModel);
         for (int i = runBeginIndex; i <= runEndIndex; i++) {
             // For each bar between both indexes...
             if (strategy.shouldOperate(i, tradingRecord)) {
-                tradingRecord.operate(i, barSeries.getBar(i).getClosePrice(), amount);
+                tradingRecord.operate(i, tradeType, barSeries.getBar(i).getClosePrice(), amount);
             }
         }
 
@@ -181,7 +181,7 @@ public class BarSeriesManager {
                 // For each bar after the end index of this run...
                 // --> Trying to close the last position
                 if (strategy.shouldOperate(i, tradingRecord)) {
-                    tradingRecord.operate(i, barSeries.getBar(i).getClosePrice(), amount);
+                    tradingRecord.operate(i, tradeType, barSeries.getBar(i).getClosePrice(), amount);
                     break;
                 }
             }

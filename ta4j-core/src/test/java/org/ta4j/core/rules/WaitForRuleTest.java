@@ -25,6 +25,8 @@ package org.ta4j.core.rules;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.ta4j.core.Trade.TradeType.BUY;
+import static org.ta4j.core.Trade.TradeType.SELL;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,12 +47,12 @@ public class WaitForRuleTest {
     @Test
     public void waitForSinceLastBuyRuleIsSatisfied() {
         // Waits for 3 bars since last buy trade
-        rule = new WaitForRule(Trade.TradeType.BUY, 3);
+        rule = new WaitForRule(BUY, 3);
 
         assertFalse(rule.isSatisfied(0, null));
         assertFalse(rule.isSatisfied(1, tradingRecord));
 
-        tradingRecord.enter(10);
+        tradingRecord.enter(10, BUY);
         assertFalse(rule.isSatisfied(10, tradingRecord));
         assertFalse(rule.isSatisfied(11, tradingRecord));
         assertFalse(rule.isSatisfied(12, tradingRecord));
@@ -61,7 +63,7 @@ public class WaitForRuleTest {
         assertTrue(rule.isSatisfied(15, tradingRecord));
         assertTrue(rule.isSatisfied(16, tradingRecord));
 
-        tradingRecord.enter(17);
+        tradingRecord.enter(17, BUY);
         assertFalse(rule.isSatisfied(17, tradingRecord));
         assertFalse(rule.isSatisfied(18, tradingRecord));
         assertFalse(rule.isSatisfied(19, tradingRecord));
@@ -71,12 +73,12 @@ public class WaitForRuleTest {
     @Test
     public void waitForSinceLastSellRuleIsSatisfied() {
         // Waits for 2 bars since last sell trade
-        rule = new WaitForRule(Trade.TradeType.SELL, 2);
+        rule = new WaitForRule(SELL, 2);
 
         assertFalse(rule.isSatisfied(0, null));
         assertFalse(rule.isSatisfied(1, tradingRecord));
 
-        tradingRecord.enter(10);
+        tradingRecord.enter(10, BUY);
         assertFalse(rule.isSatisfied(10, tradingRecord));
         assertFalse(rule.isSatisfied(11, tradingRecord));
         assertFalse(rule.isSatisfied(12, tradingRecord));
@@ -87,7 +89,7 @@ public class WaitForRuleTest {
         assertFalse(rule.isSatisfied(16, tradingRecord));
         assertTrue(rule.isSatisfied(17, tradingRecord));
 
-        tradingRecord.enter(17);
+        tradingRecord.enter(17, BUY);
         assertTrue(rule.isSatisfied(17, tradingRecord));
         assertTrue(rule.isSatisfied(18, tradingRecord));
 

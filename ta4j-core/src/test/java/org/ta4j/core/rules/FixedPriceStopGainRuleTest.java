@@ -11,6 +11,8 @@ import java.util.function.Function;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.ta4j.core.Trade.TradeType.BUY;
+import static org.ta4j.core.Trade.TradeType.SELL;
 
 public class FixedPriceStopGainRuleTest extends AbstractIndicatorTest<BarSeries, Num> {
 
@@ -32,7 +34,7 @@ public class FixedPriceStopGainRuleTest extends AbstractIndicatorTest<BarSeries,
     public void testIsSatisfiedNoPositionOpened(){
         ClosePriceIndicator closePriceIndicator = new ClosePriceIndicator(null);
 
-        final TradingRecord tradingRecord = new BaseTradingRecord(Trade.TradeType.SELL);
+        final TradingRecord tradingRecord = new BaseTradingRecord();
         FixedPriceStopGainRule rule = new FixedPriceStopGainRule(closePriceIndicator);
         assertFalse(rule.isSatisfied(1, tradingRecord));
     }
@@ -45,13 +47,13 @@ public class FixedPriceStopGainRuleTest extends AbstractIndicatorTest<BarSeries,
                         new MockBarSeries(numFunction,
                                 48873.0, 48872.5, 48799.0, 48765.5, 48709.5, 49006.0, 49587.5, 48674.5, 48782.0, 48750.0));
 
-        final TradingRecord tradingRecord = new BaseTradingRecord(Trade.TradeType.BUY);
+        final TradingRecord tradingRecord = new BaseTradingRecord();
         FixedPriceStopGainRule rule = new FixedPriceStopGainRule(closePriceIndicator);
         final Num tradedAmount = numOf(0.01);
 
         assertFalse(rule.isSatisfied(0, null));
 
-        tradingRecord.enter(1, numOf(48872.0), tradedAmount);
+        tradingRecord.enter(1, BUY, numOf(48872.0), tradedAmount);
         tradingRecord.getCurrentPosition().setCustomPositionData(new CustomPositionData(null, numOf(49550.0)));
 
         assertFalse(rule.isSatisfied(1, tradingRecord));
@@ -69,13 +71,13 @@ public class FixedPriceStopGainRuleTest extends AbstractIndicatorTest<BarSeries,
                         new MockBarSeries(numFunction,
                                 48873.0, 48872.5, 48799.0, 48765.5, 48709.5, 49006.0, 49587.5, 48674.5, 48782.0, 48750.0));
 
-        final TradingRecord tradingRecord = new BaseTradingRecord(Trade.TradeType.SELL);
+        final TradingRecord tradingRecord = new BaseTradingRecord();
         FixedPriceStopGainRule rule = new FixedPriceStopGainRule(closePriceIndicator);
         final Num tradedAmount = numOf(0.01);
 
         assertFalse(rule.isSatisfied(0, null));
 
-        tradingRecord.enter(1, numOf(48872.0), tradedAmount);
+        tradingRecord.enter(1, SELL, numOf(48872.0), tradedAmount);
         tradingRecord.getCurrentPosition().setCustomPositionData(new CustomPositionData(null, numOf(48705.0)));
 
         assertFalse(rule.isSatisfied(1, tradingRecord));

@@ -43,6 +43,8 @@ import org.ta4j.core.rules.UnderIndicatorRule;
 
 import ta4jexamples.loaders.CsvTradesLoader;
 
+import static org.ta4j.core.Trade.TradeType.BUY;
+
 /**
  * This class is an example of a dummy trading bot using ta4j.
  * <p/>
@@ -152,7 +154,7 @@ public class TradingBotOnMovingBarSeries {
             if (strategy.shouldEnter(endIndex)) {
                 // Our strategy should enter
                 System.out.println("Strategy should ENTER on " + endIndex);
-                boolean entered = tradingRecord.enter(endIndex, newBar.getClosePrice(), DecimalNum.valueOf(10));
+                boolean entered = tradingRecord.enter(endIndex, BUY, newBar.getClosePrice(), DecimalNum.valueOf(10));
                 if (entered) {
                     Trade entry = tradingRecord.getLastEntry();
                     System.out.println("Entered on " + entry.getIndex() + " (price=" + entry.getNetPrice().doubleValue()

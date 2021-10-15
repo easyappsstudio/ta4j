@@ -44,12 +44,6 @@ import org.ta4j.core.num.Num;
 public interface TradingRecord extends Serializable {
 
     /**
-     * @return the entry type (BUY or SELL) of the first trade in the trading
-     *         session
-     */
-    TradeType getStartingType();
-
-    /**
      * @return the name of the TradingRecord
      */
     String getName();
@@ -58,39 +52,43 @@ public interface TradingRecord extends Serializable {
      * Places a trade in the trading record.
      * 
      * @param index the index to place the trade
+     * @param tradeType the trade type of the trade.
      */
-    default void operate(int index) {
-        operate(index, NaN, NaN);
+    default void operate(int index, TradeType tradeType) {
+        operate(index, tradeType, NaN, NaN);
     }
 
     /**
      * Places a trade in the trading record.
      * 
      * @param index  the index to place the trade
+     * @param tradeType the trade type of the trade.
      * @param price  the trade price
      * @param amount the trade amount
      */
-    void operate(int index, Num price, Num amount);
+    void operate(int index, TradeType tradeType, Num price, Num amount);
 
     /**
      * Places an entry trade in the trading record.
      * 
      * @param index the index to place the entry
+     * @param tradeType the trade type of the trade.
      * @return true if the entry has been placed, false otherwise
      */
-    default boolean enter(int index) {
-        return enter(index, NaN, NaN);
+    default boolean enter(int index, TradeType tradeType) {
+        return enter(index, tradeType, NaN, NaN);
     }
 
     /**
      * Places an entry trade in the trading record.
      * 
      * @param index  the index to place the entry
+     * @param tradeType the trade type of the trade.
      * @param price  the trade price
      * @param amount the trade amount
      * @return true if the entry has been placed, false otherwise
      */
-    boolean enter(int index, Num price, Num amount);
+    boolean enter(int index, TradeType tradeType, Num price, Num amount);
 
     /**
      * Places an exit trade in the trading record.

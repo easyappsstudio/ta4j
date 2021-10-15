@@ -99,7 +99,7 @@ public class GrossReturnCriterionTest extends AbstractCriterionTest {
         AnalysisCriterion ret = getCriterion();
         Position position = new Position();
         assertNumEquals(1d, ret.calculate(series, position));
-        position.operate(0);
+        position.operate(0, Trade.TradeType.BUY);
         assertNumEquals(1d, ret.calculate(series, position));
     }
 

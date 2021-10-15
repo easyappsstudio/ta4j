@@ -25,6 +25,7 @@ package org.ta4j.core.analysis;
 
 import static org.junit.Assert.assertEquals;
 import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.ta4j.core.Trade.TradeType.BUY;
 
 import java.util.function.Function;
 
@@ -124,13 +125,13 @@ public class ReturnsTest extends AbstractIndicatorTest<Indicator<Num>, Num> {
         BarSeries precisionSeries = new MockBarSeries(DecimalNum::valueOf, 1.2d, 1.1d);
 
         TradingRecord fullRecordDouble = new BaseTradingRecord();
-        fullRecordDouble.enter(doubleSeries.getBeginIndex(), doubleSeries.getBar(0).getClosePrice(),
+        fullRecordDouble.enter(doubleSeries.getBeginIndex(), BUY, doubleSeries.getBar(0).getClosePrice(),
                 doubleSeries.numOf(1));
         fullRecordDouble.exit(doubleSeries.getEndIndex(), doubleSeries.getBar(1).getClosePrice(),
                 doubleSeries.numOf(1));
 
         TradingRecord fullRecordPrecision = new BaseTradingRecord();
-        fullRecordPrecision.enter(precisionSeries.getBeginIndex(), precisionSeries.getBar(0).getClosePrice(),
+        fullRecordPrecision.enter(precisionSeries.getBeginIndex(), BUY, precisionSeries.getBar(0).getClosePrice(),
                 precisionSeries.numOf(1));
         fullRecordPrecision.exit(precisionSeries.getEndIndex(), precisionSeries.getBar(1).getClosePrice(),
                 precisionSeries.numOf(1));

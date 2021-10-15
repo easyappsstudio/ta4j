@@ -26,16 +26,12 @@ package org.ta4j.core.criteria;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.ta4j.core.Trade.TradeType.BUY;
 
 import java.util.function.Function;
 
 import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.BarSeries;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.ExternalCriterionTest;
-import org.ta4j.core.Position;
-import org.ta4j.core.TradingRecord;
+import org.ta4j.core.*;
 import org.ta4j.core.mocks.MockBarSeries;
 import org.ta4j.core.num.Num;
 
@@ -70,17 +66,17 @@ public class LinearTransactionCostCriterionTest extends AbstractCriterionTest {
         TradingRecord tradingRecord = new BaseTradingRecord();
         Num criterion;
 
-        tradingRecord.operate(0);
-        tradingRecord.operate(1);
+        tradingRecord.operate(0, BUY);
+        tradingRecord.operate(1, BUY);
         criterion = getCriterion(1000d, 0.005, 0.2).calculate(series, tradingRecord);
         assertNumEquals(12.861, criterion);
 
-        tradingRecord.operate(2);
-        tradingRecord.operate(3);
+        tradingRecord.operate(2, BUY);
+        tradingRecord.operate(3, BUY);
         criterion = getCriterion(1000d, 0.005, 0.2).calculate(series, tradingRecord);
         assertNumEquals(24.3759, criterion);
 
-        tradingRecord.operate(5);
+        tradingRecord.operate(5, BUY);
         criterion = getCriterion(1000d, 0.005, 0.2).calculate(series, tradingRecord);
         assertNumEquals(28.2488, criterion);
     }
@@ -91,17 +87,17 @@ public class LinearTransactionCostCriterionTest extends AbstractCriterionTest {
         TradingRecord tradingRecord = new BaseTradingRecord();
         Num criterion;
 
-        tradingRecord.operate(0);
-        tradingRecord.operate(1);
+        tradingRecord.operate(0, BUY);
+        tradingRecord.operate(1, BUY);
         criterion = getCriterion(1000d, 0d, 1.3d).calculate(series, tradingRecord);
         assertNumEquals(2.6d, criterion);
 
-        tradingRecord.operate(2);
-        tradingRecord.operate(3);
+        tradingRecord.operate(2, BUY);
+        tradingRecord.operate(3, BUY);
         criterion = getCriterion(1000d, 0d, 1.3d).calculate(series, tradingRecord);
         assertNumEquals(5.2d, criterion);
 
-        tradingRecord.operate(0);
+        tradingRecord.operate(0, BUY);
         criterion = getCriterion(1000d, 0d, 1.3d).calculate(series, tradingRecord);
         assertNumEquals(6.5d, criterion);
     }
@@ -115,15 +111,15 @@ public class LinearTransactionCostCriterionTest extends AbstractCriterionTest {
         criterion = getCriterion(1000d, 0d, 0.75d).calculate(series, position);
         assertNumEquals(0d, criterion);
 
-        position.operate(1);
+        position.operate(1, BUY);
         criterion = getCriterion(1000d, 0d, 0.75d).calculate(series, position);
         assertNumEquals(0.75d, criterion);
 
-        position.operate(3);
+        position.operate(3, BUY);
         criterion = getCriterion(1000d, 0d, 0.75d).calculate(series, position);
         assertNumEquals(1.5d, criterion);
 
-        position.operate(4);
+        position.operate(4, BUY);
         criterion = getCriterion(1000d, 0d, 0.75d).calculate(series, position);
         assertNumEquals(1.5d, criterion);
     }

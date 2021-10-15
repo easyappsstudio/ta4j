@@ -27,6 +27,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.ta4j.core.Trade.TradeType.BUY;
+import static org.ta4j.core.Trade.TradeType.SELL;
 import static org.ta4j.core.num.NaN.NaN;
 
 import org.junit.Before;
@@ -56,7 +58,7 @@ public class TradingRecordTest {
     public void operate() {
         TradingRecord record = new BaseTradingRecord();
 
-        record.operate(1);
+        record.operate(1, BUY);
         assertTrue(record.getCurrentPosition().isOpened());
         assertEquals(0, record.getPositionCount());
         assertNull(record.getLastPosition());
@@ -66,7 +68,7 @@ public class TradingRecordTest {
         assertEquals(Trade.buyAt(1, NaN, NaN), record.getLastEntry());
         assertNull(record.getLastExit());
 
-        record.operate(3);
+        record.operate(3, BUY);
         assertTrue(record.getCurrentPosition().isNew());
         assertEquals(1, record.getPositionCount());
         assertEquals(new Position(Trade.buyAt(1, NaN, NaN), Trade.sellAt(3, NaN, NaN)), record.getLastPosition());
@@ -76,7 +78,7 @@ public class TradingRecordTest {
         assertEquals(Trade.buyAt(1, NaN, NaN), record.getLastEntry());
         assertEquals(Trade.sellAt(3, NaN, NaN), record.getLastExit());
 
-        record.operate(5);
+        record.operate(5, BUY);
         assertTrue(record.getCurrentPosition().isOpened());
         assertEquals(1, record.getPositionCount());
         assertEquals(new Position(Trade.buyAt(1, NaN, NaN), Trade.sellAt(3, NaN, NaN)), record.getLastPosition());
@@ -85,6 +87,40 @@ public class TradingRecordTest {
         assertEquals(Trade.sellAt(3, NaN, NaN), record.getLastTrade(Trade.TradeType.SELL));
         assertEquals(Trade.buyAt(5, NaN, NaN), record.getLastEntry());
         assertEquals(Trade.sellAt(3, NaN, NaN), record.getLastExit());
+
+        // close previous position
+        record.operate(6, SELL);// type is ignored here since we're closing the position.
+        assertTrue(record.getCurrentPosition().isNew());
+        assertEquals(2, record.getPositionCount());
+        assertEquals(new Position(Trade.buyAt(5, NaN, NaN), Trade.sellAt(6, NaN, NaN)), record.getLastPosition());
+        assertEquals(Trade.sellAt(6, NaN, NaN), record.getLastTrade());
+        assertEquals(Trade.buyAt(5, NaN, NaN), record.getLastTrade(Trade.TradeType.BUY));
+        assertEquals(Trade.sellAt(6, NaN, NaN), record.getLastTrade(Trade.TradeType.SELL));
+        assertEquals(Trade.buyAt(5, NaN, NaN), record.getLastEntry());
+        assertEquals(Trade.sellAt(6, NaN, NaN), record.getLastExit());
+
+        record.operate(7, SELL); // entering a position in a different direction
+        assertTrue(record.getCurrentPosition().isOpened());
+        assertTrue(record.getCurrentPosition().getEntry().isSell());
+        assertEquals(2, record.getPositionCount());
+        assertEquals(new Position(Trade.buyAt(5, NaN, NaN), Trade.sellAt(6, NaN, NaN)), record.getLastPosition());
+        assertEquals(Trade.sellAt(7, NaN, NaN), record.getLastTrade());
+        assertEquals(Trade.buyAt(5, NaN, NaN), record.getLastTrade(Trade.TradeType.BUY));
+        assertEquals(Trade.sellAt(7, NaN, NaN), record.getLastTrade(Trade.TradeType.SELL));
+        assertEquals(Trade.sellAt(7, NaN, NaN), record.getLastEntry());
+        assertEquals(Trade.sellAt(6, NaN, NaN), record.getLastExit());
+
+        // close previous position
+        record.operate(9, BUY);// type is ignored here since we're closing the position.
+        assertTrue(record.getCurrentPosition().isNew());
+        assertEquals(3, record.getPositionCount());
+        assertEquals(new Position(Trade.sellAt(7, NaN, NaN), Trade.buyAt(9, NaN, NaN)), record.getLastPosition());
+        assertEquals(Trade.buyAt(9, NaN, NaN), record.getLastTrade());
+        assertEquals(Trade.buyAt(9, NaN, NaN), record.getLastTrade(Trade.TradeType.BUY));
+        assertEquals(Trade.sellAt(7, NaN, NaN), record.getLastTrade(Trade.TradeType.SELL));
+        assertEquals(Trade.sellAt(7, NaN, NaN), record.getLastEntry());
+        assertEquals(Trade.buyAt(9, NaN, NaN), record.getLastExit());
+
     }
 
     @Test

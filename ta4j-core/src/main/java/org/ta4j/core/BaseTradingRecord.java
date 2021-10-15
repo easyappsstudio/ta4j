@@ -92,59 +92,30 @@ public class BaseTradingRecord implements TradingRecord {
 
     /**
      * Constructor.
-     */
-    public BaseTradingRecord() {
-        this(TradeType.BUY);
-    }
-
-    /**
-     * Constructor.
      *
      * @param name the name of the tradingRecord
      */
     public BaseTradingRecord(String name) {
-        this(TradeType.BUY);
         this.name = name;
     }
 
     /**
-     * Constructor.
-     *
-     * @param name           the name of the trading record
-     * @param entryTradeType the {@link TradeType trade type} of entries in the
-     *                       trading session
+     * Default Constructor.
      */
-    public BaseTradingRecord(String name, TradeType tradeType) {
-        this(tradeType, new ZeroCostModel(), new ZeroCostModel());
-        this.name = name;
+    public BaseTradingRecord() {
+        this(new ZeroCostModel(), new ZeroCostModel());
     }
 
     /**
      * Constructor.
      *
-     * @param entryTradeType the {@link TradeType trade type} of entries in the
-     *                       trading session
-     */
-    public BaseTradingRecord(TradeType tradeType) {
-        this(tradeType, new ZeroCostModel(), new ZeroCostModel());
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param entryTradeType       the {@link TradeType trade type} of entries in
-     *                             the trading session
      * @param transactionCostModel the cost model for transactions of the asset
      * @param holdingCostModel     the cost model for holding asset (e.g. borrowing)
      */
-    public BaseTradingRecord(TradeType entryTradeType, CostModel transactionCostModel, CostModel holdingCostModel) {
-        if (entryTradeType == null) {
-            throw new IllegalArgumentException("Starting type must not be null");
-        }
-        this.startingType = entryTradeType;
+    public BaseTradingRecord(CostModel transactionCostModel, CostModel holdingCostModel) {
         this.transactionCostModel = transactionCostModel;
         this.holdingCostModel = holdingCostModel;
-        currentPosition = new Position(entryTradeType, transactionCostModel, holdingCostModel);
+        currentPosition = new Position(transactionCostModel, holdingCostModel);
     }
 
     /**
@@ -164,7 +135,7 @@ public class BaseTradingRecord implements TradingRecord {
      * @param trades               the trades to be recorded (cannot be empty)
      */
     public BaseTradingRecord(CostModel transactionCostModel, CostModel holdingCostModel, Trade... trades) {
-        this(trades[0].getType(), transactionCostModel, holdingCostModel);
+        this(transactionCostModel, holdingCostModel);
         for (Trade o : trades) {
             boolean newTradeWillBeAnEntry = currentPosition.isNew();
             if (newTradeWillBeAnEntry && o.getType() != startingType) {
@@ -173,9 +144,9 @@ public class BaseTradingRecord implements TradingRecord {
                 // BUY, SELL,
                 // SELL, BUY,
                 // BUY, SELL
-                currentPosition = new Position(o.getType(), transactionCostModel, holdingCostModel);
+                currentPosition = new Position(transactionCostModel, holdingCostModel);
             }
-            Trade newTrade = currentPosition.operate(o.getIndex(), o.getPricePerAsset(), o.getAmount());
+            Trade newTrade = currentPosition.operate(o.getIndex(), o.getType(), o.getPricePerAsset(), o.getAmount());
             recordTrade(newTrade, newTradeWillBeAnEntry);
         }
     }
@@ -186,30 +157,25 @@ public class BaseTradingRecord implements TradingRecord {
     }
 
     @Override
-    public TradeType getStartingType() {
-        return startingType;
-    }
-
-    @Override
     public Position getCurrentPosition() {
         return currentPosition;
     }
 
     @Override
-    public void operate(int index, Num price, Num amount) {
+    public void operate(int index, TradeType tradeType, Num price, Num amount) {
         if (currentPosition.isClosed()) {
             // Current position closed, should not occur
             throw new IllegalStateException("Current position should not be closed");
         }
         boolean newTradeWillBeAnEntry = currentPosition.isNew();
-        Trade newTrade = currentPosition.operate(index, price, amount);
+        Trade newTrade = currentPosition.operate(index, tradeType, price, amount);
         recordTrade(newTrade, newTradeWillBeAnEntry);
     }
 
     @Override
-    public boolean enter(int index, Num price, Num amount) {
+    public boolean enter(int index, TradeType tradeType, Num price, Num amount) {
         if (currentPosition.isNew()) {
-            operate(index, price, amount);
+            operate(index, tradeType, price, amount);
             return true;
         }
         return false;
@@ -218,7 +184,7 @@ public class BaseTradingRecord implements TradingRecord {
     @Override
     public boolean exit(int index, Num price, Num amount) {
         if (currentPosition.isOpened()) {
-            operate(index, price, amount);
+            operate(index, currentPosition.getEntry().getType().complementType(), price, amount);
             return true;
         }
         return false;
@@ -294,7 +260,7 @@ public class BaseTradingRecord implements TradingRecord {
         // Storing the position if closed
         if (currentPosition.isClosed()) {
             positions.add(currentPosition);
-            currentPosition = new Position(startingType, transactionCostModel, holdingCostModel);
+            currentPosition = new Position(transactionCostModel, holdingCostModel);
         }
     }
 

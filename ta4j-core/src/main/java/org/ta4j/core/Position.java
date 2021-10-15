@@ -49,9 +49,6 @@ public class Position implements Serializable {
     /** The exit trade */
     private Trade exit;
 
-    /** The type of the entry trade */
-    private final TradeType startingType;
-
     /** The cost model for transactions of the asset */
     private final CostModel transactionCostModel;
 
@@ -65,32 +62,16 @@ public class Position implements Serializable {
      * Constructor.
      */
     public Position() {
-        this(TradeType.BUY);
+        this(new ZeroCostModel(), new ZeroCostModel());
     }
 
     /**
      * Constructor.
-     * 
-     * @param startingType the starting {@link TradeType trade type} of the position
-     *                     (i.e. type of the entry trade)
-     */
-    public Position(TradeType startingType) {
-        this(startingType, new ZeroCostModel(), new ZeroCostModel());
-    }
-
-    /**
-     * Constructor.
-     * 
-     * @param startingType         the starting {@link TradeType trade type} of the
-     *                             position (i.e. type of the entry trade)
+     *
      * @param transactionCostModel the cost model for transactions of the asset
      * @param holdingCostModel     the cost model for holding asset (e.g. borrowing)
      */
-    public Position(TradeType startingType, CostModel transactionCostModel, CostModel holdingCostModel) {
-        if (startingType == null) {
-            throw new IllegalArgumentException("Starting type must not be null");
-        }
-        this.startingType = startingType;
+    public Position(CostModel transactionCostModel, CostModel holdingCostModel) {
         this.transactionCostModel = transactionCostModel;
         this.holdingCostModel = holdingCostModel;
     }
@@ -124,7 +105,6 @@ public class Position implements Serializable {
             throw new IllegalArgumentException("Trades and the position must incorporate the same trading cost model");
         }
 
-        this.startingType = entry.getType();
         this.entry = entry;
         this.exit = exit;
         this.transactionCostModel = transactionCostModel;
@@ -164,30 +144,34 @@ public class Position implements Serializable {
      * Operates the position at the index-th position
      * 
      * @param index the bar index
+     * @param tradeType the trade type.
      * @return the trade
      */
-    public Trade operate(int index) {
-        return operate(index, NaN, NaN);
+    public Trade operate(int index, TradeType tradeType) {
+        return operate(index, tradeType, NaN, NaN);
     }
 
     /**
-     * Operates the position at the index-th position
+     * Operates the position at the index-th position.
+     *
+     * For a closing trade the tradeType parameter is ignored since the position complement type will be used instead.
      * 
      * @param index  the bar index
+     * @param tradeType the trade type.
      * @param price  the price
      * @param amount the amount
      * @return the trade
      */
-    public Trade operate(int index, Num price, Num amount) {
+    public Trade operate(int index, TradeType tradeType, Num price, Num amount) {
         Trade trade = null;
         if (isNew()) {
-            trade = new Trade(index, startingType, price, amount, transactionCostModel);
+            trade = new Trade(index, tradeType, price, amount, transactionCostModel);
             entry = trade;
         } else if (isOpened()) {
             if (index < entry.getIndex()) {
                 throw new IllegalStateException("The index i is less than the entryTrade index");
             }
-            trade = new Trade(index, startingType.complementType(), price, amount, transactionCostModel);
+            trade = new Trade(index, entry.getType().complementType(), price, amount, transactionCostModel);
             exit = trade;
         }
         return trade;
@@ -399,13 +383,6 @@ public class Position implements Serializable {
      */
     public Num getHoldingCost(int finalIndex) {
         return holdingCostModel.calculate(this, finalIndex);
-    }
-
-    /**
-     * @return the {@link #startingType}
-     */
-    public TradeType getStartingType() {
-        return startingType;
     }
 
     /**

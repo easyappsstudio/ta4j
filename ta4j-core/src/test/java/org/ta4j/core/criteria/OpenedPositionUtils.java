@@ -39,8 +39,8 @@ public class OpenedPositionUtils {
             AnalysisCriterion criterion, int expectedValue) {
         MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 110, 100, 95, 105);
 
-        Position trade = new Position(Trade.TradeType.BUY);
-        trade.operate(0, series.numOf(2.5), series.numOf(1));
+        Position trade = new Position();
+        trade.operate(0, Trade.TradeType.BUY, series.numOf(2.5), series.numOf(1));
 
         final Num value = criterion.calculate(series, trade);
 
