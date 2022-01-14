@@ -50,8 +50,8 @@ public class FixedTransactionCostModelTest {
         double feePerTrade = RANDOM.nextDouble();
         FixedTransactionCostModel model = new FixedTransactionCostModel(feePerTrade);
 
-        Position position = new Position(TradeType.BUY, model, null);
-        position.operate(0, PRICE, AMOUNT);
+        Position position = new Position(model, null);
+        position.operate(0, TradeType.BUY, PRICE, AMOUNT);
         Num cost = model.calculate(position);
 
         assertNumEquals(cost, DoubleNum.valueOf(feePerTrade * positionTrades));
