@@ -21,45 +21,52 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.criteria.pnl;
+package org.ta4j.core.indicators.numeric;
+
+import java.util.function.UnaryOperator;
 
 import org.ta4j.core.BarSeries;
-import org.ta4j.core.Position;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.criteria.AbstractAnalysisCriterion;
+import org.ta4j.core.Indicator;
 import org.ta4j.core.num.Num;
 
 /**
- * Net profit criterion (excludes trading costs).
- *
- * <p>
- * The net profit of the provided {@link Position position(s)} over the provided
- * {@link BarSeries series}.
+ * Objects of this class defer the evaluation of a unary operator, like sqrt().
+ * 
+ * There may be other unary operations on Num that could be added here.
  */
-public class NetProfitCriterion extends AbstractAnalysisCriterion {
+class UnaryOperation implements Indicator<Num> {
 
-    @Override
-    public Num calculate(BarSeries series, Position position) {
-        if (position.isClosed()) {
-            Num profit = position.getProfit();
-            return profit.isPositive() ? profit : series.numOf(0);
-        }
-        return series.numOf(0);
+    public static UnaryOperation sqrt(Indicator<Num> operand) {
+        return new UnaryOperation(Num::sqrt, operand);
+    }
 
+    public static UnaryOperation abs(Indicator<Num> operand) {
+        return new UnaryOperation(Num::abs, operand);
+    }
+
+    private final UnaryOperator<Num> operator;
+    private final Indicator<Num> operand;
+
+    private UnaryOperation(UnaryOperator<Num> operator, Indicator<Num> operand) {
+        this.operator = operator;
+        this.operand = operand;
     }
 
     @Override
-    public Num calculate(BarSeries series, TradingRecord tradingRecord) {
-        return tradingRecord.getPositions()
-                .stream()
-                .filter(Position::isClosed)
-                .map(position -> calculate(series, position))
-                .reduce(series.numOf(0), Num::plus);
+    public Num getValue(int index) {
+        Num n = operand.getValue(index);
+        return operator.apply(n);
     }
 
-    /** The higher the criterion value, the better. */
     @Override
-    public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return criterionValue1.isGreaterThan(criterionValue2);
+    public BarSeries getBarSeries() {
+        return operand.getBarSeries();
     }
+
+    // make this a default method in the Indicator interface...
+    @Override
+    public Num numOf(Number number) {
+        return operand.numOf(number);
+    }
+
 }

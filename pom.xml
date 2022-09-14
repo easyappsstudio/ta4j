@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.ta4j</groupId>
 	<artifactId>ta4j-parent</artifactId>
-	<version>0.15_starting_type_removal-SNAPSHOT</version>
+	<version>0.16_starting_type_removal-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Ta4j Parent</name>
@@ -86,7 +86,7 @@
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6</version>
+						<version>1.6.13</version>
 						<extensions>true</extensions>
 						<configuration>
 							<!-- The Base URL of Nexus instance where we want to stage -->
